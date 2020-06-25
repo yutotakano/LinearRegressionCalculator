@@ -106,19 +106,19 @@ public class LinearRegressionViewModel extends ViewModel {
 
             // OjAlgo Matrix intermediate arrays have to be {{1, 2, 3}, {4,5,6}, {7, 8, 9}} format,
             // so loop through data to create that structure.
-            Double[][] arr_data = new Double[staticXs.length][staticPolynomial + 1];
-            Double[][] arr_output = new Double[staticXs.length][1];
+            Double[][] arrData = new Double[staticXs.length][staticPolynomial + 1];
+            Double[][] arrOutput = new Double[staticXs.length][1];
             for(int i = 0; i < staticXs.length; i++) {
-                arr_data[i][0] = 1d; // Set first column to 1
+                arrData[i][0] = 1d; // Set first column to 1
                 for(int p = 1; p <= staticPolynomial; p++) {
-                    arr_data[i][p] = Math.pow(staticXs[i], p); // Set subsequent columns to powers of X_1
+                    arrData[i][p] = Math.pow(staticXs[i], p); // Set subsequent columns to powers of X_1
                 }
-                arr_output[i][0] = staticYs[i];
+                arrOutput[i][0] = staticYs[i];
             }
 
             Primitive64Matrix.Factory matrixFactory = Primitive64Matrix.FACTORY;
-            Primitive64Matrix designXMatrix = matrixFactory.rows(arr_data);
-            Primitive64Matrix outputYMatrix = matrixFactory.rows(arr_output);
+            Primitive64Matrix designXMatrix = matrixFactory.rows(arrData);
+            Primitive64Matrix outputYMatrix = matrixFactory.rows(arrOutput);
 
             // Use the normal equation formula to calculate theta
             Primitive64Matrix A = designXMatrix.transpose().multiply(designXMatrix);
