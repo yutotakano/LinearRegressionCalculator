@@ -44,7 +44,7 @@ public class InputFragment extends Fragment {
         view.findViewById(R.id.begin_calculation_button).setOnClickListener(view1 -> {
 
             // Make sure that input X and inputY are numbers, and m > 1
-            Double[] currentXs, currentYs = new Double[]{};
+            Double[] currentXs, currentYs;
             try {
                 currentXs = sanitizeTrainingDataX(xsInputView.getText().toString().split("\n"));
                 currentYs = sanitizeTrainingDataY(ysInputView.getText().toString().split("\n"));
@@ -71,7 +71,7 @@ public class InputFragment extends Fragment {
             }
 
             // Make sure learning rate is a Double
-            Double learningRate = 0.01;
+            Double learningRate;
             try {
                 learningRate = Double.valueOf(learningRateInputView.getText().toString());
             } catch (NumberFormatException e) {
@@ -83,7 +83,7 @@ public class InputFragment extends Fragment {
             }
 
             // Make sure polynomial is an Integer
-            Integer polynomial = 1;
+            Integer polynomial;
             try {
                 polynomial = Integer.valueOf(polynomialInputView.getText().toString());
             } catch (NumberFormatException e) {
