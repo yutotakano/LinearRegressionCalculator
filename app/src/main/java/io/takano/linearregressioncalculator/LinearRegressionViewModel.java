@@ -20,6 +20,14 @@ public class LinearRegressionViewModel extends ViewModel {
     private MutableLiveData<ArrayList<Double>> costHistory = new MutableLiveData<>();
     private MutableLiveData<String> type = new MutableLiveData<>("gd");
 
+    /**
+     * Populate the required values for calculation.
+     * @param x Input array
+     * @param y Output array
+     * @param learningRate How fast should gradient descent descend? i.e. value of alpha
+     * @param polynomial Max polynomial to take into account
+     * @param type Gradient Descent "gd" or Normal Equation "ne"
+     */
     public void initialize(Double[] x, Double[] y, Double learningRate, Integer polynomial, String type) {
         this.x.setValue(x);
         this.y.setValue(y);
@@ -29,6 +37,9 @@ public class LinearRegressionViewModel extends ViewModel {
         this.type.setValue(type);
     }
 
+    /**
+     * Begin the calculation function using the type variable as a switch.
+     */
     public void beginCalculation() {
         switch(Objects.requireNonNull(type.getValue())) {
             case "gd":
@@ -42,24 +53,41 @@ public class LinearRegressionViewModel extends ViewModel {
         }
     }
 
+    /**
+     * Execute the LinearRegressionGradientDescentRunnable runnable.
+     */
     public void beginGradientDescent() {
         LinearRegressionGradientDescentRunnable runnable = new LinearRegressionGradientDescentRunnable();
         new Thread(runnable).start();
     }
 
+    /**
+     * Execute the LinearRegressionNormalEquationRunnable runnable.
+     */
     public void beginNormalEquation() {
         LinearRegressionNormalEquationRunnable runnable = new LinearRegressionNormalEquationRunnable();
         new Thread(runnable).start();
     }
 
+    /**
+     * Retrieve the value of theta, which is either null or the calculated value.
+     * @return Calculated value of theta, or null
+     */
     public LiveData<Double[]> getTheta() {
         return theta;
     }
 
+    /**
+     * Retrieve the value of costHistory
+     * @return ever-expanding ArrayList reference
+     */
     public LiveData<ArrayList<Double>> getCostHistory() {
         return costHistory;
     }
 
+    /**
+     * Normal Equation version.
+     */
     class LinearRegressionNormalEquationRunnable implements Runnable {
 
         Double[] staticXs, staticYs;
@@ -73,8 +101,11 @@ public class LinearRegressionViewModel extends ViewModel {
 
         @Override
         public void run() {
+            // For convenience:
             Integer m = staticXs.length;
-            // Matrix intermediate arrays have to be {1, 2, 3}, {4,5,6}, {7, 8, 9} format
+
+            // OjAlgo Matrix intermediate arrays have to be {{1, 2, 3}, {4,5,6}, {7, 8, 9}} format,
+            // so loop through data to create that structure.
             Double[][] arr_data = new Double[staticXs.length][staticPolynomial + 1];
             Double[][] arr_output = new Double[staticXs.length][1];
             for(int i = 0; i < staticXs.length; i++) {
@@ -84,18 +115,25 @@ public class LinearRegressionViewModel extends ViewModel {
                 }
                 arr_output[i][0] = staticYs[i];
             }
+
             Primitive64Matrix.Factory matrixFactory = Primitive64Matrix.FACTORY;
             Primitive64Matrix designXMatrix = matrixFactory.rows(arr_data);
             Primitive64Matrix outputYMatrix = matrixFactory.rows(arr_output);
 
+            // Use the normal equation formula to calculate theta
             Primitive64Matrix A = designXMatrix.transpose().multiply(designXMatrix);
             Primitive64Matrix B = A.invert();
             Primitive64Matrix C = B.multiply(designXMatrix.transpose());
             Primitive64Matrix ThetaMatrix = C.multiply(outputYMatrix);
+
+            // Convert Primitive64Matrix to Double[] and put it in theta
             theta.postValue(DoubleStream.of(ThetaMatrix.toRawCopy1D()).boxed().toArray(Double[]::new));
         }
     }
 
+    /**
+     * Gradient Descent version.
+     */
     class LinearRegressionGradientDescentRunnable implements Runnable {
 
         // manage xs, ys separately inside this runnable, don't use viewmodel data
@@ -112,8 +150,11 @@ public class LinearRegressionViewModel extends ViewModel {
 
         @Override
         public void run() {
+            // For convenience:
             int m = staticXs.length;
-            // Matrix intermediate arrays have to be {1, 2, 3}, {4,5,6}, {7, 8, 9} format
+
+            // OjAlgo Matrix intermediate arrays have to be {{1, 2, 3}, {4,5,6}, {7, 8, 9}} format,
+            // so loop through data to create that structure.
             Double[][] arrData = new Double[staticXs.length][staticPolynomial + 1];
             Double[][] arrOutput = new Double[staticXs.length][1];
             for(int i = 0; i < staticXs.length; i++) {
@@ -123,6 +164,7 @@ public class LinearRegressionViewModel extends ViewModel {
                 }
                 arrOutput[i][0] = staticYs[i];
             }
+            // Also restructure the theta array, which is needed for Gradient Descent
             Double[][] arrTheta = new Double[staticPolynomial + 1][1];
             for(int i = 0; i < staticPolynomial + 1; i++) {
                 arrTheta[i][0] = 0d;
@@ -133,31 +175,42 @@ public class LinearRegressionViewModel extends ViewModel {
             Primitive64Matrix currentThetaMatrix = matrixFactory.rows(arrTheta);
 
             boolean repeat = true;
+            // Repeat until convergence
             while(repeat) {
-                Primitive64Matrix A = designXMatrix.multiply(currentThetaMatrix).subtract(outputYMatrix); // m x 1
-                Primitive64Matrix cost = designXMatrix.transpose().multiply(A).multiply(1.0 / m); // n x 1
-                ArrayList<Double> currentCostHistory = costHistory.getValue();
-                if (currentCostHistory == null) {
-                    currentCostHistory = new ArrayList<>();
+                // Retrieve the cost history to put the new value in
+                ArrayList<Double> mutableCostHistory = costHistory.getValue();
+                if (mutableCostHistory == null) {
+                    mutableCostHistory = new ArrayList<>();
                 }
-                Double lastCost = 999999d;
-                if (currentCostHistory.size() > 0) {
-                    lastCost = currentCostHistory.get(currentCostHistory.size() - 1);
-                }
+
+                Primitive64Matrix A = designXMatrix.multiply(currentThetaMatrix).subtract(outputYMatrix); // A = m x 1
+                Primitive64Matrix cost = designXMatrix.transpose().multiply(A).multiply(1.0 / m); // cost = n x 1
+                // Mark the "cost" for this iteration as the Sum of the costs for each training example
                 Double currentCost = Math.abs(cost.reduceColumns(Aggregator.SUM).get(0, 0));
+                // If cost is too large, divergence is happening, so stop before history is added.
                 if (currentCost.isNaN()) {
                     break;
                 }
-                double costPercentageChange = currentCost / lastCost;
-                currentCostHistory.add(currentCost);
-                costHistory.postValue(currentCostHistory);
+                mutableCostHistory.add(currentCost);
+                // Set new cost history
+                costHistory.postValue(mutableCostHistory);
 
-                Primitive64Matrix nextThetaMatrix = currentThetaMatrix.subtract(cost.multiply(staticLearningRate));
-                if (Math.abs(1 - costPercentageChange) < 0.0000001d) {
+                // Calculate percentage change using the last cost, or if it didn't exist, a big number
+                Double lastCost = 999999d;
+                if (mutableCostHistory.size() > 0) {
+                    lastCost = mutableCostHistory.get(mutableCostHistory.size() - 1);
+                }
+                double costPercentageChange = 1 - (currentCost / lastCost);
+                // Safe to say, if each iteration only changes by 0.00001% then it's pretty much converged
+                if (Math.abs(costPercentageChange) < 0.0000001d) {
                     repeat = false;
                 }
-                currentThetaMatrix = nextThetaMatrix;
+
+                // Update theta
+                currentThetaMatrix = currentThetaMatrix.subtract(cost.multiply(staticLearningRate));
             }
+
+            // Convert Primitive64Matrix to Double[] and put it in theta
             theta.postValue(DoubleStream.of(currentThetaMatrix.toRawCopy1D()).boxed().toArray(Double[]::new));
         }
     }

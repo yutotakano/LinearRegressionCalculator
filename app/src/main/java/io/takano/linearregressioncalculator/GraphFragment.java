@@ -33,13 +33,23 @@ public class GraphFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        LinearRegressionViewModel model = new ViewModelProvider(requireActivity()).get(LinearRegressionViewModel.class);
         TextView headerView = view.findViewById(R.id.result_header);
         LineChart costChart = (LineChart) view.findViewById(R.id.linechart_cost);
+
+        // Load the same model as that was populated in InputFragment
+        LinearRegressionViewModel model = new ViewModelProvider(requireActivity()).get(LinearRegressionViewModel.class);
+
+        // Begin calculation in the background thread using the specified input parameters and calculation type
         model.beginCalculation();
+
+        // When theta is found (no longer null), set the text in headerView accordingly
         model.getTheta().observe(getViewLifecycleOwner(), item -> headerView.setText(getString(R.string.theta_result, Arrays.toString(item))));
+
+        // Update the graph of cost function J() over iteration
         model.getCostHistory().observe(getViewLifecycleOwner(), item -> {
+            // Make a copy of ArrayList item because otherwise we'd edit the original
             List<Double> copy = new ArrayList<>(item);
+            // Add the float version of each cost, together with the index
             List<Entry> entries = new ArrayList<>();
             for (int i = 0; i < copy.size(); i++) {
                 entries.add(new Entry(i, copy.get(i).floatValue()));
@@ -47,6 +57,7 @@ public class GraphFragment extends Fragment {
             LineDataSet dataSet = new LineDataSet(entries, "Cost over iteration");
             LineData lineData = new LineData(dataSet);
             costChart.setData(lineData);
+            // Invalidate the existing chart, i.e. refresh the chart
             costChart.invalidate();
         });
     }
