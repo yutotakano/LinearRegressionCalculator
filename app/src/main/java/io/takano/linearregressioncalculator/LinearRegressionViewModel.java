@@ -197,8 +197,8 @@ public class LinearRegressionViewModel extends ViewModel {
 
                 // Calculate percentage change using the last cost, or if it didn't exist, a big number
                 Double lastCost = 999999d;
-                if (mutableCostHistory.size() > 0) {
-                    lastCost = mutableCostHistory.get(mutableCostHistory.size() - 1);
+                if (mutableCostHistory.size() > 1) {
+                    lastCost = mutableCostHistory.get(mutableCostHistory.size() - 2);
                 }
                 double costPercentageChange = 1 - (currentCost / lastCost);
                 // Safe to say, if each iteration only changes by 0.00001% then it's pretty much converged
