@@ -48,16 +48,24 @@ public class InputFragment extends Fragment {
             try {
                 currentXs = sanitizeTrainingDataX(xsInputView.getText().toString().split("\n"));
                 currentYs = sanitizeTrainingDataY(ysInputView.getText().toString().split("\n"));
+            } catch (InvalidInputLengthException e) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getResources().getString(R.string.error_title))
+                        .setMessage(getResources().getString(R.string.error_body_training_data_too_little))
+                        .show();
+                return;
             } catch (NumberFormatException e) {
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(getResources().getString(R.string.error_title))
                         .setMessage(getResources().getString(R.string.error_body_training_data_not_number))
                         .show();
                 return;
-            } catch (InvalidInputLengthException e) {
+            }
+
+            if (currentXs.length != currentYs.length) {
                 new MaterialAlertDialogBuilder(requireContext())
                         .setTitle(getResources().getString(R.string.error_title))
-                        .setMessage(getResources().getString(R.string.error_body_training_data_too_little))
+                        .setMessage(getResources().getString(R.string.error_body_training_data_mismatch))
                         .show();
                 return;
             }
@@ -107,11 +115,11 @@ public class InputFragment extends Fragment {
      * @throws InvalidInputLengthException on m <= 1
      */
     private Double[] sanitizeTrainingDataX(String[] xStrings) throws InvalidInputLengthException {
-        Double[] checkedX;
-        checkedX = Arrays.stream(xStrings).mapToDouble(Double::valueOf).boxed().toArray(Double[]::new);
-        if (checkedX.length <= 1) {
+        if (xStrings.length <= 1) {
             throw new InvalidInputLengthException();
         }
+        Double[] checkedX;
+        checkedX = Arrays.stream(xStrings).mapToDouble(Double::valueOf).boxed().toArray(Double[]::new);
         return checkedX;
     }
 
@@ -122,11 +130,11 @@ public class InputFragment extends Fragment {
      * @throws InvalidInputLengthException on m <= 1
      */
     private Double[] sanitizeTrainingDataY(String[] yStrings) throws InvalidInputLengthException {
-        Double[] checkedY;
-        checkedY = Arrays.stream(yStrings).mapToDouble(Double::valueOf).boxed().toArray(Double[]::new);
-        if (checkedY.length <= 1) {
+        if (yStrings.length <= 1) {
             throw new InvalidInputLengthException();
         }
+        Double[] checkedY;
+        checkedY = Arrays.stream(yStrings).mapToDouble(Double::valueOf).boxed().toArray(Double[]::new);
         return checkedY;
     }
 }

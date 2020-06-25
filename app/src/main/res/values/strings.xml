@@ -21,6 +21,7 @@
     <string name="error_title">Sorry, try again!</string>
     <string name="error_body_training_data_not_number">One or more of the provided training data are not valid numbers!</string>
     <string name="error_body_training_data_too_little">There has to be n > 1 input data!</string>
+    <string name="error_body_training_data_mismatch">The number of training data don\'t match for x and y!</string>
     <string name="error_body_learning_rate_not_number">The learning rate appears to not be a valid decimal number! Try values between 0.01–0.03 to start.</string>
     <string name="error_body_polynomial_not_number">The polynomial has to be a valid integer, within logically acceptable ranges!</string>
 
