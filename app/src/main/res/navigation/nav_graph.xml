@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/InputFragment">
+
+    <fragment
+        android:id="@+id/InputFragment"
+        android:name="io.takano.linearregressioncalculator.InputFragment"
+        android:label="@string/input_fragment_label"
+        tools:layout="@layout/fragment_input">
+
+        <action
+            android:id="@+id/actionPassInputToGraph"
+            app:destination="@id/GraphFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/GraphFragment"
+        android:name="io.takano.linearregressioncalculator.GraphFragment"
+        android:label="@string/graph_fragment_label"
+        tools:layout="@layout/fragment_graph"/>
+</navigation>

@@ -1,0 +1,2 @@
+rootProject.name='Linear Regression Calculator'
+include ':app'
