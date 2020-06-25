@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RadioButton;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
 import java.util.Arrays;
 
 import androidx.annotation.NonNull;
@@ -42,31 +44,45 @@ public class InputFragment extends Fragment {
         view.findViewById(R.id.begin_calculation_button).setOnClickListener(view1 -> {
 
             // Make sure that input X and inputY are numbers, and m > 1
-            Double[] currentXs, currentYs;
+            Double[] currentXs, currentYs = new Double[]{};
             try {
                 currentXs = sanitizeTrainingDataX(xsInputView.getText().toString().split("\n"));
                 currentYs = sanitizeTrainingDataY(ysInputView.getText().toString().split("\n"));
             } catch (NumberFormatException e) {
-                // some non-numbers there
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getResources().getString(R.string.error_title))
+                        .setMessage(getResources().getString(R.string.error_body_training_data_not_number))
+                        .show();
                 return;
             } catch (InvalidInputLengthException e) {
-                // not enough length
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getResources().getString(R.string.error_title))
+                        .setMessage(getResources().getString(R.string.error_body_training_data_too_little))
+                        .show();
                 return;
             }
 
             // Make sure learning rate is a Double
-            Double learningRate;
+            Double learningRate = 0.01;
             try {
                 learningRate = Double.valueOf(learningRateInputView.getText().toString());
             } catch (NumberFormatException e) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getResources().getString(R.string.error_title))
+                        .setMessage(getResources().getString(R.string.error_body_learning_rate_not_number))
+                        .show();
                 return;
             }
 
             // Make sure polynomial is an Integer
-            Integer polynomial;
+            Integer polynomial = 1;
             try {
                 polynomial = Integer.valueOf(polynomialInputView.getText().toString());
             } catch (NumberFormatException e) {
+                new MaterialAlertDialogBuilder(requireContext())
+                        .setTitle(getResources().getString(R.string.error_title))
+                        .setMessage(getResources().getString(R.string.error_body_polynomial_not_number))
+                        .show();
                 return;
             }
 

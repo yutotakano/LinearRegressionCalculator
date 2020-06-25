@@ -4,14 +4,20 @@
     <string name="input_fragment_label">Input Data</string>
     <string name="graph_fragment_label">Visualisation of J()</string>
 
-    <string name="theta_result">Calculated theta: %s.</string>
-    <string name="begin_calculation_button_text">Begin Calculation</string>
     <string name="input_label_training_data">Training Data (each on a new line)</string>
     <string name="input_label_xs">X values</string>
     <string name="input_label_ys">Y values</string>
     <string name="input_label_configuration">Configuration</string>
     <string name="input_label_learning_rate">Learning Rate</string>
     <string name="input_label_polynomial_degree">Polynomial Degree</string>
-    <string name="radio_type_normal_equation_text">Normal Equation</string>
     <string name="radio_type_gradient_descent_text">Gradient Descent</string>
+    <string name="radio_type_normal_equation_text">Normal Equation</string>
+    <string name="begin_calculation_button_text">Begin Calculation</string>
+    <string name="theta_result">Calculated theta: %s.</string>
+
+    <string name="error_title">Sorry, try again!</string>
+    <string name="error_body_training_data_not_number">One or more of the provided training data are not valid numbers!</string>
+    <string name="error_body_training_data_too_little">There has to be n > 1 input data!</string>
+    <string name="error_body_learning_rate_not_number">The learning rate appears to not be a valid decimal number! Try values between 0.01–0.03 to start.</string>
+    <string name="error_body_polynomial_not_number">The polynomial has to be a valid integer, within logically acceptable ranges!</string>
 </resources>
