@@ -24,7 +24,8 @@
                 android:text="@string/about_about_heading"
                 android:textAlignment="center"
                 android:textSize="30sp"
-                android:typeface="sans" />
+                android:typeface="sans"
+                android:textColor="@color/colorAccent" />
 
             <TextView
                 android:id="@+id/about_about_body"
@@ -33,7 +34,6 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/about_about_body"
                 android:textAlignment="viewStart" />
-
 
             <TextView
                 android:id="@+id/about_license_heading"
@@ -44,7 +44,8 @@
                 android:text="@string/about_license_heading"
                 android:textAlignment="center"
                 android:textSize="30sp"
-                android:typeface="sans" />
+                android:typeface="sans"
+                android:textColor="@color/colorAccent"/>
 
             <TextView
                 android:id="@+id/about_license_body"
