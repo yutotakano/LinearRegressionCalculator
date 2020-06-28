@@ -22,6 +22,11 @@ import androidx.lifecycle.ViewModelProvider;
 public class GraphFragment extends Fragment {
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
@@ -33,7 +38,6 @@ public class GraphFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView headerView = view.findViewById(R.id.result_header);
         LineChart costChart = (LineChart) view.findViewById(R.id.linechart_cost);
 
         // Load the same model as that was populated in InputFragment
@@ -43,7 +47,7 @@ public class GraphFragment extends Fragment {
         model.beginCalculation();
 
         // When theta is found (no longer null), set the text in headerView accordingly
-        model.getTheta().observe(getViewLifecycleOwner(), item -> headerView.setText(getString(R.string.theta_result, Arrays.toString(item))));
+//        model.getTheta().observe(getViewLifecycleOwner(), item -> headerView.setText(getString(R.string.theta_result, Arrays.toString(item))));
 
         // Update the graph of cost function J() over iteration
         model.getCostHistory().observe(getViewLifecycleOwner(), item -> {
