@@ -1,9 +1,15 @@
 package io.takano.linearregressioncalculator;
 
+import android.util.Log;
+
+import com.github.mikephil.charting.data.Entry;
+
 import org.ojalgo.function.aggregator.Aggregator;
 import org.ojalgo.matrix.Primitive64Matrix;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.DoubleStream;
 
@@ -83,6 +89,53 @@ public class LinearRegressionViewModel extends ViewModel {
      */
     public LiveData<ArrayList<Double>> getCostHistory() {
         return costHistory;
+    }
+
+    /**
+     * Generate plot points for the calculated theta taking into account the max/min Xs
+     * @return Entries to be used for MPAndroidChart
+     */
+    public LiveData<List<List<Entry>>> generateChartEntries() {
+        // Find the domain of the chart
+        Double[] staticX = x.getValue();
+        Double[] staticY = y.getValue();
+        Integer staticPolynomial = polynomial.getValue();
+        Double[] staticTheta = theta.getValue();
+        if (staticX == null || staticY == null) return new MutableLiveData<List<List<Entry>>>(){};
+        if (staticPolynomial == null) return new MutableLiveData<List<List<Entry>>>(){};
+        Double minX = staticX[0];
+        Double maxX = staticX[0];
+        List<Entry> scatterEntries = new ArrayList<>();
+        for (int i = 0; i < staticX.length; i++) {
+            if (staticX[i] < minX) {
+                minX = staticX[i];
+            } else if (staticX[i] > maxX) {
+                maxX = staticX[i];
+            }
+
+            // also let's take this opportunity to build the scatter chart
+            scatterEntries.add(new Entry(staticX[i].floatValue(), staticY[i].floatValue()));
+        }
+
+        // let's now generate the calculated h_theta (x) plot
+        Primitive64Matrix.Factory matrixFactory = Primitive64Matrix.FACTORY;
+        Primitive64Matrix thetaMatrixTransposed = matrixFactory.columns(staticTheta);
+        Log.d("TEST", thetaMatrixTransposed.toString());
+        double unit = (maxX - minX) / 20d;
+        List<Entry> hypothesisEntries = new ArrayList<>();
+        for (Double i = minX; i <= maxX; i = i + unit) {
+            // h_theta (i)
+            double[] arrXPolynomials = new double[staticPolynomial + 1];
+            for (int j = 0; j <= staticPolynomial; j++) {
+                arrXPolynomials[j] = Math.pow(i, j);
+            }
+            Primitive64Matrix xPolynomials = matrixFactory.rows(arrXPolynomials);
+            hypothesisEntries.add(new Entry(i.floatValue(), xPolynomials.multiply(thetaMatrixTransposed).reduceRows(Aggregator.SUM).get(0, 0).floatValue()));
+        }
+        List<List<Entry>> returnValue = new ArrayList<>();
+        returnValue.add(scatterEntries);
+        returnValue.add(hypothesisEntries);
+        return new MutableLiveData<>(returnValue);
     }
 
     /**

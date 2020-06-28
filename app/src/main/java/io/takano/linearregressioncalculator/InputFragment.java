@@ -22,7 +22,7 @@ public class InputFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
-    
+
     @Override
     public View onCreateView(
             LayoutInflater inflater, ViewGroup container,
@@ -108,7 +108,7 @@ public class InputFragment extends Fragment {
             model.initialize(currentXs, currentYs, learningRate, polynomial, calculationType);
 
             // Navigate to GraphFragment
-            NavHostFragment.findNavController(InputFragment.this).navigate(InputFragmentDirections.actionPassInputToGraph());
+            NavHostFragment.findNavController(InputFragment.this).navigate(InputFragmentDirections.actionMoveToGraph());
         });
 
     }

@@ -18,6 +18,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.fragment.NavHostFragment;
 
 public class GraphFragment extends Fragment {
 
@@ -31,6 +32,8 @@ public class GraphFragment extends Fragment {
             LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
+
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_graph, container, false);
     }
@@ -46,8 +49,8 @@ public class GraphFragment extends Fragment {
         // Begin calculation in the background thread using the specified input parameters and calculation type
         model.beginCalculation();
 
-        // When theta is found (no longer null), set the text in headerView accordingly
-//        model.getTheta().observe(getViewLifecycleOwner(), item -> headerView.setText(getString(R.string.theta_result, Arrays.toString(item))));
+        // When theta is found (no longer null), navigate to ResultsFragment
+        model.getTheta().observe(getViewLifecycleOwner(), item -> NavHostFragment.findNavController(GraphFragment.this).navigate(GraphFragmentDirections.actionMoveToResults()));
 
         // Update the graph of cost function J() over iteration
         model.getCostHistory().observe(getViewLifecycleOwner(), item -> {
